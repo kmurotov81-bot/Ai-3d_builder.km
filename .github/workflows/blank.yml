@@ -1,36 +1,90 @@
-# This is a basic workflow to help you get started with Actions
+name: Socratic Math Tutor - Android CI
 
-name: CI
-
-# Controls when the workflow will run
 on:
-  # Triggers the workflow on push or pull request events but only for the "main" branch
   push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+    branches:
+      - main
+      - develop
 
-  # Allows you to run this workflow manually from the Actions tab
+  pull_request:
+
   workflow_dispatch:
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
   build:
-    # The type of runner that the job will run on
+    name: Build & Test Android
     runs-on: ubuntu-latest
 
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v4
+      # 1. Kodni olish
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      # Runs a single command using the runners shell
-      - name: Run a one-line script
-        run: echo Hello, world!
+      # 2. Java 17
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
 
-      # Runs a set of commands using the runners shell
-      - name: Run a multi-line script
+      # 3. Gradle
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+
+      # 4. Environment tekshirish
+      - name: Check project
         run: |
-          echo Add other actions to build,
-          echo test, and deploy your project.
+          echo "Checking Socratic Math Tutor project..."
+          java -version
+          gradle --version
+
+      # 5. Compile
+      - name: Compile Kotlin
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          DESMOS_API_KEY: ${{ secrets.DESMOS_API_KEY }}
+        run: |
+          gradle compileDebugKotlin --stacktrace
+
+      # 6. Unit test
+      - name: Run tests
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          DESMOS_API_KEY: ${{ secrets.DESMOS_API_KEY }}
+        run: |
+          gradle test --stacktrace
+
+      # 7. Android lint
+      - name: Run Android Lint
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          DESMOS_API_KEY: ${{ secrets.DESMOS_API_KEY }}
+        run: |
+          gradle lint --stacktrace
+
+      # 8. Debug APK
+      - name: Build Debug APK
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          DESMOS_API_KEY: ${{ secrets.DESMOS_API_KEY }}
+        run: |
+          gradle assembleDebug --stacktrace
+
+      # 9. APKni saqlash
+      - name: Upload Debug APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: socratic-math-tutor-debug
+          path: app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+
+      # 10. Lint report
+      - name: Upload Lint Report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: android-lint-report
+          path: app/build/reports/lint-results-debug.html
+          if-no-files-found: ignore
