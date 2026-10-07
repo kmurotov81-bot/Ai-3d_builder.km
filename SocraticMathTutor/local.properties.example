@@ -1,0 +1,4 @@
+# Copy to local.properties (never commit it) and fill in:
+ANTHROPIC_API_KEY=sk-ant-...
+# Get your own key at https://www.desmos.com/api (free for most uses)
+DESMOS_API_KEY=your_desmos_api_key
