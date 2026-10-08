@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Speech bubble (the tutor asks questions instead of giving answers) -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M30,34h48a8,8 0 0,1 8,8v20a8,8 0 0,1 -8,8h-26l-10,9v-9h-12a8,8 0 0,1 -8,-8v-20a8,8 0 0,1 8,-8z" />
+    <!-- Question mark dot and "x" to hint at algebra -->
+    <path
+        android:fillColor="#FFE9BF"
+        android:pathData="M42,46 a4,4 0 1,0 8,0 a4,4 0 1,0 -8,0z" />
+    <path
+        android:fillColor="#FFE9BF"
+        android:pathData="M56,42h4v4h4v4h-4v4h-4v-4h-4v-4h4z" />
+    <path
+        android:fillColor="#FFE9BF"
+        android:pathData="M68,50 a4,4 0 1,0 8,0 a4,4 0 1,0 -8,0z" />
+</vector>
