@@ -1,0 +1,64 @@
+name: Android CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: SocraticMathTutor
+    env:
+      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      AI_PROVIDER: ${{ vars.AI_PROVIDER }}
+      BACKEND_URL: ${{ vars.BACKEND_URL }}
+      DESMOS_API_KEY: ${{ secrets.DESMOS_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+
+      - name: Pick Gradle command
+        run: |
+          if [ -x ./gradlew ]; then echo "GRADLE=./gradlew" >> "$GITHUB_ENV"; else echo "GRADLE=gradle" >> "$GITHUB_ENV"; fi
+
+      - name: Compile
+        run: $GRADLE --no-daemon compileDebugKotlin
+
+      - name: Unit tests
+        run: $GRADLE --no-daemon testDebugUnitTest
+
+      - name: Lint
+        run: $GRADLE --no-daemon lintDebug
+        continue-on-error: true
+
+      - name: Build debug APK
+        run: $GRADLE --no-daemon assembleDebug
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: debug-apk
+          path: SocraticMathTutor/app/build/outputs/apk/debug/*.apk
+
+  backend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: SocraticMathTutor/backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: node --test
