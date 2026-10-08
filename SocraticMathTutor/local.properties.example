@@ -1,0 +1,11 @@
+# Copy to local.properties (never commit it).
+# --- AI (development): key is compiled into the APK. Fine for testing, NOT for publishing. ---
+AI_PROVIDER=gemini
+GEMINI_API_KEY=your_gemini_key
+# GEMINI_MODEL=gemini-2.5-flash
+# ANTHROPIC_API_KEY=sk-ant-...      # only if AI_PROVIDER=claude
+# --- AI (production): use the backend in /backend; then no AI key is needed in the app ---
+# BACKEND_URL=https://your-backend.example.com
+# APP_TOKEN=long-random-string      # must match the backend's APP_TOKEN
+# --- Graphs ---
+# DESMOS_API_KEY=your_desmos_api_key
